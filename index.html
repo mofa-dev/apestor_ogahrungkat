@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>ApestorScan — IDX & US</title>
+<title>ApestorSusahSinyal — IDX & US by M0F4-DEV</title>
 <style>
 :root {
   --bg: #080c14;
@@ -475,8 +475,8 @@ body {
   <div class="logo">
     <div class="logo-icon">📈</div>
     <div>
-      <div class="logo-text">ApestorScan</div>
-      <div class="logo-sub">IDX · US by MOF4-DEV</div>
+      <div class="logo-text">ApestorSusahSinyal</div>
+      <div class="logo-sub">IDX · US | Konfirmasi Ulang Buat Entry Selalu DYOR! Not Financial Advace</div>
     </div>
   </div>
   <div class="header-right">
@@ -492,7 +492,7 @@ body {
   <div class="setting-row">
     <div>
       <div class="setting-label">Data Source</div>
-      <div class="setting-sub">Yahoo Finance — gratis, tanpa API key</div>
+      <div class="setting-sub">Yahoo Finance · 5 proxy fallback otomatis</div>
     </div>
   </div>
   <button onclick="testConnection()" style="width:100%;margin-top:6px;padding:7px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔌 Test Koneksi</button>
@@ -562,11 +562,11 @@ body {
       </button>
       <button class="mswitch-btn" onclick="setMarket('US')" data-market="US">
         <span class="ms-flag">🇺🇸</span>
-        <span class="ms-name">US list Ajaib</span>
+        <span class="ms-name">US Stocks</span>
       </button>
       <button class="mswitch-btn" onclick="setMarket('ALL')" data-market="ALL">
         <span class="ms-flag">🌏</span>
-        <span class="ms-name">All in</span>
+        <span class="ms-name">Semua</span>
       </button>
     </div>
 
@@ -586,6 +586,7 @@ body {
       <button class="btn-force" onclick="confirmForceRefresh()">↺ Force</button>
     </div>
     <div class="last-scan" id="lastScanInfo">Belum pernah scan hari ini</div>
+    <div id="fetchErrorBanner" style="display:none;margin-top:6px;padding:8px 10px;background:var(--red2);border:1px solid rgba(255,77,106,0.3);border-radius:7px;font-size:11px;color:var(--red)"></div>
 
     <div class="loading-bar" style="margin-top:8px">
       <div class="loading-fill" id="loadingBar" style="width:0%"></div>
@@ -604,7 +605,7 @@ body {
       <div class="empty-state">
         <div class="empty-icon">📊</div>
         <div>Tap "Scan Sinyal" untuk mulai</div>
-        <div style="margin-top:6px; font-size:11px">DYOR NFA, konfirmasi lagi sinyal, jangan asal Entry!</div>
+        <div style="margin-top:6px; font-size:11px">Pastikan API key sudah diset di ⚙</div>
       </div>
     </div>
   </div>
@@ -716,7 +717,7 @@ body {
 // STOCK LISTS
 // ============================================================
 
-// IDX — LQ45 + Saham US di Ajaib
+// IDX — LQ45 + saham populer Ajaib
 const IDX_STOCKS = [
   {sym:'BBCA',name:'Bank Central Asia'},
   {sym:'BBRI',name:'Bank Rakyat Indonesia'},
@@ -908,30 +909,35 @@ async function testConnection() {
   el.style.display = 'block';
   el.style.background = 'var(--yellow2)';
   el.style.color = 'var(--yellow)';
-  el.textContent = '⏳ Testing Yahoo Finance...';
+  el.textContent = '⏳ Testing semua proxy...';
 
-  async function tryFetch(ticker) {
-    const urls = [
-      `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=5d`,
-      `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=5d`,
-      `https://corsproxy.io/?https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=5d`,
-    ];
-    for (const u of urls) {
-      try {
-        const r = await fetch(u, { headers: { Accept: 'application/json' } });
-        const d = await r.json();
-        if (d?.chart?.result?.[0]?.timestamp?.length > 0) return true;
-      } catch(e) {}
-    }
-    return false;
+  const proxies = [
+    { label: 'Direct Q1', url: ticker => `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=5d` },
+    { label: 'Direct Q2', url: ticker => `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=5d` },
+    { label: 'AllOrigins', url: ticker => `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+ticker+'?interval=1d&range=5d')}` },
+    { label: 'CorsProxy.io', url: ticker => `https://corsproxy.io/?${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+ticker+'?interval=1d&range=5d')}` },
+  ];
+
+  const results = [];
+  for (const p of proxies) {
+    el.textContent = `⏳ Testing ${p.label}...`;
+    let ok = false;
+    try {
+      const r = await fetch(p.url('BBCA.JK'), { signal: AbortSignal.timeout(6000) });
+      if (r.ok) {
+        const text = await r.text();
+        const d = JSON.parse(text);
+        ok = d?.chart?.result?.[0]?.timestamp?.length > 0;
+      }
+    } catch(e) {}
+    results.push(`${p.label}: ${ok ? '✅' : '❌'}`);
+    if (ok) break; // stop at first working proxy
   }
 
-  const idxOk = await tryFetch('BBCA.JK');
-  const usOk  = await tryFetch('AAPL');
-
-  el.style.background = (idxOk && usOk) ? 'var(--green2)' : 'var(--yellow2)';
-  el.style.color = (idxOk && usOk) ? 'var(--green)' : 'var(--yellow)';
-  el.textContent = `IDX: ${idxOk?'✅ OK':'❌ Gagal'} • US: ${usOk?'✅ OK':'❌ Gagal'} — ${(idxOk&&usOk)?'Siap scan!':'Cek koneksi internet'}`;
+  const anyOk = results.some(r => r.includes('✅'));
+  el.style.background = anyOk ? 'var(--green2)' : 'var(--red2)';
+  el.style.color = anyOk ? 'var(--green)' : 'var(--red)';
+  el.innerHTML = results.join(' &nbsp;·&nbsp; ') + '<br>' + (anyOk ? '✅ Koneksi OK, siap scan!' : '❌ Semua proxy gagal — cek internet/VPN');
 }
 function getApiKey() { return localStorage.getItem('ss_apikey') || ''; }
 
@@ -1095,13 +1101,13 @@ function analyzeStock(sym, name, ohlcv, market) {
   if (range > 0 && (highs[n-1] - Math.max(price, open)) / range > 0.6
       && tags.includes('breakout')) score -= 2;
 
-  // KLASIFIKASI — threshold lebih realistis
+  // KLASIFIKASI — threshold realistis
   let signal = 'WAIT';
-  if      (score >= 8) signal = 'STRONG BUY';
-  else if (score >= 5) signal = 'BUY';
-  else if (score >= 3) signal = 'WATCH';
+  if      (score >= 7) signal = 'STRONG BUY';
+  else if (score >= 4) signal = 'BUY';
+  else if (score >= 2) signal = 'WATCH';
 
-  const confidence = score >= 8 ? 'HIGH' : score >= 5 ? 'MEDIUM' : 'LOW';
+  const confidence = score >= 7 ? 'HIGH' : score >= 4 ? 'MEDIUM' : 'LOW';
   const prevClose  = closes[n-2] || price;
   const changeP    = ((price - prevClose) / prevClose) * 100;
 
@@ -1123,43 +1129,64 @@ function analyzeStock(sym, name, ohlcv, market) {
 }
 
 // ============================================================
-// DATA SOURCE — Yahoo Finance + CORS proxy fallback untuk mobile
+// DATA SOURCE — Yahoo Finance + multi-proxy CORS fallback
 // ============================================================
+const FETCH_STATS = { ok: 0, fail: 0, proxy: '' };
+
+function parseYahooData(d) {
+  const result = d?.chart?.result?.[0];
+  if (!result) return null;
+  const ts = result.timestamp;
+  const q  = result.indicators?.quote?.[0];
+  if (!ts || !q || ts.length < 5) return null;
+  const out = [];
+  for (let i = 0; i < ts.length; i++) {
+    if (q.close[i] == null) continue;
+    out.push({
+      open:   q.open[i]   || q.close[i],
+      high:   q.high[i]   || q.close[i],
+      low:    q.low[i]    || q.close[i],
+      close:  q.close[i],
+      volume: q.volume[i] || 0,
+    });
+  }
+  return out.length >= 5 ? out : null;
+}
+
 async function fetchYahoo(sym, market) {
   const ticker = market === 'IDX' ? sym + '.JK' : sym;
-  const path   = `${ticker}?interval=1d&range=4mo&includePrePost=false`;
-  const urls   = [
-    `https://query1.finance.yahoo.com/v8/finance/chart/${path}`,
-    `https://query2.finance.yahoo.com/v8/finance/chart/${path}`,
-    `https://corsproxy.io/?https://query1.finance.yahoo.com/v8/finance/chart/${path}`,
+  const yPath  = `${ticker}?interval=1d&range=4mo&includePrePost=false`;
+  const yBase1 = `https://query1.finance.yahoo.com/v8/finance/chart/`;
+  const yBase2 = `https://query2.finance.yahoo.com/v8/finance/chart/`;
+
+  // Proxy list — urutan dari paling cepat ke fallback
+  const proxies = [
+    { label: 'direct-q1',   url: `${yBase1}${yPath}`,  headers: { 'Accept': 'application/json' } },
+    { label: 'direct-q2',   url: `${yBase2}${yPath}`,  headers: { 'Accept': 'application/json' } },
+    { label: 'allorigins',  url: `https://api.allorigins.win/raw?url=${encodeURIComponent(yBase1+yPath)}`, headers: {} },
+    { label: 'corsproxy.io',url: `https://corsproxy.io/?${encodeURIComponent(yBase1+yPath)}`, headers: {} },
+    { label: 'cors.sh',     url: `https://proxy.cors.sh/${yBase1}${yPath}`, headers: { 'x-cors-api-key': 'temp_' } },
   ];
 
-  for (const url of urls) {
+  for (const p of proxies) {
     try {
-      const r = await fetch(url, { headers: { Accept: 'application/json' } });
+      const r = await fetch(p.url, { headers: p.headers, signal: AbortSignal.timeout(8000) });
       if (!r.ok) continue;
-      const d = await r.json();
-      const result = d?.chart?.result?.[0];
-      if (!result) continue;
-      const ts = result.timestamp;
-      const q  = result.indicators?.quote?.[0];
-      if (!ts || !q || ts.length < 5) continue;
-      const out = [];
-      for (let i = 0; i < ts.length; i++) {
-        if (q.close[i] == null) continue;
-        out.push({
-          open:   q.open[i]   || q.close[i],
-          high:   q.high[i]   || q.close[i],
-          low:    q.low[i]    || q.close[i],
-          close:  q.close[i],
-          volume: q.volume[i] || 0,
-        });
+      const text = await r.text();
+      let d;
+      try { d = JSON.parse(text); } catch { continue; }
+      const out = parseYahooData(d);
+      if (out) {
+        FETCH_STATS.ok++;
+        FETCH_STATS.proxy = p.label;
+        return out;
       }
-      if (out.length >= 5) return out;
     } catch(e) {
-      console.warn(`[${sym}] error:`, e.message);
+      // timeout or network error, try next proxy
     }
   }
+  FETCH_STATS.fail++;
+  console.warn(`[FAIL] ${sym} — semua proxy gagal`);
   return null;
 }
 
@@ -1228,10 +1255,22 @@ async function startScan(forceRefresh = false) {
   document.getElementById('btnScan').textContent = '🔍 Scan Sinyal';
   document.getElementById('loadingBar').style.width = '0%';
   const now = new Date().toLocaleTimeString('id');
+  const proxyUsed = FETCH_STATS.proxy ? ` · via ${FETCH_STATS.proxy}` : '';
+  const failNote = FETCH_STATS.fail > 0 ? ` · ⚠️ ${FETCH_STATS.fail} gagal` : '';
   document.getElementById('lastScanInfo').textContent =
-    `Selesai ${now} • ${fetched} fetch • ${fromCache} cache • Yahoo Finance`;
+    `Selesai ${now} · ${fetched} fetch · ${fromCache} cache${proxyUsed}${failNote}`;
+  FETCH_STATS.ok = 0; FETCH_STATS.fail = 0; FETCH_STATS.proxy = '';
   updateCacheCount(); updateStats();
   showToast(`✓ ${APP.signals.length} sinyal ditemukan`);
+  
+  // Show warning if many failed
+  const banner = document.getElementById('fetchErrorBanner');
+  if (FETCH_STATS.fail > 5) {
+    banner.style.display = 'block';
+    banner.innerHTML = `⚠️ <strong>${FETCH_STATS.fail} saham gagal di-fetch</strong> karena CORS. Coba gunakan VPN, atau buka di browser lain (Firefox/Chrome desktop). <a href="#" onclick="testConnection();toggleSettings();return false" style="color:var(--red);text-decoration:underline">Test koneksi →</a>`;
+  } else {
+    banner.style.display = 'none';
+  }
 }
 
 function processResult(stock, ohlcv) {
