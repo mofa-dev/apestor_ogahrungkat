@@ -544,7 +544,7 @@ body {
 <!-- TABS -->
 <div class="tabs">
   <div class="tab active" onclick="switchTab('signals')">SINYAL</div>
-  <div class="tab" onclick="switchTab('portfolio')">EKUITAS</div>
+  <div class="tab" onclick="switchTab('catatan')">CATATAN</div>
   <div class="tab" onclick="switchTab('watchlist')">WATCHLIST</div>
 </div>
 
@@ -610,45 +610,38 @@ body {
     </div>
   </div>
 
-  <!-- ===== PORTFOLIO TAB ===== -->
-  <div class="tab-content" id="tab-portfolio">
-    <div class="equity-panel">
-      <div class="section-title">Total Ekuitas</div>
-      <div class="eq-amount" id="eqAmount">Rp 0</div>
-      <div class="eq-change" id="eqChange"></div>
-      <div class="eq-stats">
-        <div class="eq-stat">
-          <div class="eq-slabel">Menang</div>
-          <div class="eq-sval" style="color:var(--green)" id="eqWins">0</div>
-        </div>
-        <div class="eq-stat">
-          <div class="eq-slabel">Kalah</div>
-          <div class="eq-sval" style="color:var(--red)" id="eqLosses">0</div>
-        </div>
-        <div class="eq-stat">
-          <div class="eq-slabel">Buka</div>
-          <div class="eq-sval" style="color:var(--yellow)" id="eqOpen">0</div>
-        </div>
-        <div class="eq-stat">
-          <div class="eq-slabel">Win Rate</div>
-          <div class="eq-sval" id="eqWR">—</div>
-        </div>
+  <!-- ===== CATATAN TRADING TAB ===== -->
+  <div class="tab-content" id="tab-catatan">
+
+    <!-- Info bar -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 13px;margin-bottom:12px;font-size:11px;color:var(--text3);line-height:1.6">
+      📋 <strong style="color:var(--text2)">Catatan Trading</strong> — catat rencana entry kamu dari sinyal di atas.
+      Hasil trade (profit/loss) diisi <strong style="color:var(--text2)">manual</strong> sesuai realisasi di broker kamu.
+    </div>
+
+    <!-- Statistik ringkas -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px">TOTAL</div>
+        <div style="font-size:18px;font-weight:800" id="statTotal">0</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px">PROFIT</div>
+        <div style="font-size:18px;font-weight:800;color:var(--green)" id="statWin">0</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px">LOSS</div>
+        <div style="font-size:18px;font-weight:800;color:var(--red)" id="statLoss">0</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px">WIN RATE</div>
+        <div style="font-size:18px;font-weight:800;color:var(--yellow)" id="statWR">—</div>
       </div>
     </div>
 
-    <div class="eq-input-row">
-      <input class="eq-input" id="eqInput" type="number" placeholder="Modal awal (Rp)" />
-      <button class="btn-set" onclick="setEquity()">SET</button>
-    </div>
-    <div style="display:flex; gap:8px; align-items:center; margin-bottom:14px">
-      <span style="font-size:11px; color:var(--text3)">Risk per trade:</span>
-      <input class="eq-input" id="riskInput" type="number" value="1" style="width:60px; flex:none" />
-      <span style="font-size:11px; color:var(--text3)">%</span>
-    </div>
-
-    <div class="section-title">Riwayat Trade</div>
-    <div id="tradesList">
-      <div class="empty-state"><div class="empty-icon">📋</div>Belum ada trade</div>
+    <!-- List catatan -->
+    <div id="catatanList">
+      <div class="empty-state"><div class="empty-icon">📋</div>Belum ada catatan<br><span style="font-size:11px">Tap sinyal → tombol CATAT</span></div>
     </div>
   </div>
 
@@ -674,37 +667,30 @@ body {
     </div>
     <div class="trade-grid">
       <div class="trade-field">
-        <div class="field-label">Harga Entry</div>
+        <div class="field-label">Harga Entry (acuan)</div>
         <div class="field-val" id="mEntry">—</div>
       </div>
       <div class="trade-field">
-        <div class="field-label">Stop Loss</div>
+        <div class="field-label">Stop Loss (acuan)</div>
         <div class="field-val red" id="mSL">—</div>
       </div>
       <div class="trade-field">
-        <div class="field-label">Take Profit</div>
+        <div class="field-label">Take Profit (acuan)</div>
         <div class="field-val green" id="mTP">—</div>
       </div>
       <div class="trade-field">
-        <div class="field-label">Lot / Lembar</div>
-        <div class="field-val" id="mSize">—</div>
-      </div>
-      <div class="trade-field">
-        <div class="field-label">Modal Terpakai</div>
-        <div class="field-val" id="mCapital">—</div>
-      </div>
-      <div class="trade-field">
-        <div class="field-label">Potensi Profit</div>
-        <div class="field-val green" id="mProfit">—</div>
+        <div class="field-label">Risk:Reward</div>
+        <div class="field-val" id="mRR">1 : 2.5</div>
       </div>
     </div>
     <div class="modal-analysis" id="mAnalysis">—</div>
     <div class="btn-row">
-      <button class="btn-primary" id="btnTrade" onclick="takeTrade()">CATAT TRADE</button>
+      <button class="btn-primary" id="btnTrade" onclick="takeTrade()">+ CATAT</button>
       <button class="btn-secondary" onclick="addWatch()">+ WATCH</button>
     </div>
-    <div style="font-size:10px; color:var(--text3); text-align:center" id="mNote">
-      Sinyal ini bukan rekomendasi investasi. Selalu lakukan analisis mandiri.
+    <div style="font-size:10px; color:var(--text3); text-align:center; line-height:1.5" id="mNote">
+      Harga entry/SL/TP di atas adalah <strong>acuan dari sinyal</strong>.<br>
+      Eksekusi dan hasil trade tetap bergantung pada broker kamu. DYOR.
     </div>
   </div>
 </div>
@@ -1025,10 +1011,49 @@ function calcRSI(closes, period=14) {
 }
 
 // ============================================================
-// SIGNAL ENGINE — threshold longgar, banyak jalur sinyal
+// SUSPEND / HALT DETECTOR — otomatis dari data real
+// ============================================================
+function isSuspended(ohlcv) {
+  if (!ohlcv || ohlcv.length < 5) return false;
+  const recent = ohlcv.slice(-10); // 10 hari terakhir
+
+  // 1. Volume nol semua di 5 hari terakhir → pasti suspend
+  const last5vol = ohlcv.slice(-5).map(d => d.volume);
+  if (last5vol.every(v => v === 0)) return true;
+
+  // 2. Harga flatline total (close identik semua) di 5 hari terakhir
+  const last5close = ohlcv.slice(-5).map(d => d.close);
+  const allSamePrice = last5close.every(c => c === last5close[0]);
+  if (allSamePrice) return true;
+
+  // 3. High = Low = Close di 5 hari terakhir (candle tanpa range = tidak ada transaksi)
+  const deadCandles = ohlcv.slice(-5).filter(d =>
+    d.high === d.low && d.high === d.close && d.volume === 0
+  );
+  if (deadCandles.length >= 4) return true;
+
+  // 4. Volume rata-rata 5 hari terakhir < 1% dari rata-rata 30 hari sebelumnya
+  // → volume collapsed drastis = indikasi suspend/delisting
+  if (ohlcv.length >= 35) {
+    const vol5  = ohlcv.slice(-5).reduce((a,d)=>a+d.volume,0) / 5;
+    const vol30 = ohlcv.slice(-35,-5).reduce((a,d)=>a+d.volume,0) / 30;
+    if (vol30 > 0 && vol5 / vol30 < 0.01) return true;
+  }
+
+  return false;
+}
+
+// ============================================================
+// SIGNAL ENGINE — logika ketat, anti fake signal
 // ============================================================
 function analyzeStock(sym, name, ohlcv, market) {
-  if (!ohlcv || ohlcv.length < 10) return null;
+  if (!ohlcv || ohlcv.length < 15) return null;
+
+  // AUTO FILTER: saham suspend/halt tidak diproses sama sekali
+  if (isSuspended(ohlcv)) {
+    console.info(`[SUSPEND] ${sym} dilewati — terdeteksi suspend/halt/no-volume`);
+    return null;
+  }
 
   const closes = ohlcv.map(d => d.close);
   const highs  = ohlcv.map(d => d.high);
@@ -1038,93 +1063,185 @@ function analyzeStock(sym, name, ohlcv, market) {
   const price  = closes[n-1];
   const open   = ohlcv[n-1].open;
 
-  // Indikator — adaptive period
-  const p20  = Math.min(20, Math.floor(n * 0.65));
-  const p50  = Math.min(50, n - 1);
-  const pRSI = Math.min(14, Math.floor(n * 0.5));
-  const ema20 = calcEMA(closes, p20);
-  const ema50 = p50 >= p20 + 5 ? calcEMA(closes, p50) : null;
-  const rsi   = calcRSI(closes, pRSI);
+  // ── Indikator dasar ──────────────────────────────────────
+  const ema20 = calcEMA(closes, Math.min(20, n - 1));
+  const ema50 = n >= 55 ? calcEMA(closes, 50) : null;
+  const rsi   = calcRSI(closes, Math.min(14, n - 2));
   if (!ema20 || rsi === null) return null;
 
+  const r = parseFloat(rsi);
+
+  // ── Volume: pakai data TANPA candle hari ini ──────────────
+  // Ini penting agar tidak bias membandingkan volume sekarang dengan dirinya sendiri
+  const volPrev = vols.slice(0, n - 1).filter(v => v > 0);
+  const volToday = vols[n - 1];
+  const avgVol   = volPrev.length >= 5
+    ? volPrev.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, volPrev.length)
+    : 0;
+  const volRatio = avgVol > 0 ? volToday / avgVol : 0;
+  const hasVolSpike = volRatio >= 1.5;  // minimal 1.5x rata-rata, bukan 1.3x
+  const hasDecentVol = volRatio >= 0.5; // volume hari ini tidak "mati"
+
+  // ── Trend structure ───────────────────────────────────────
+  const trendUp   = ema50 ? (ema20 > ema50 * 1.001) : (price > ema20 * 1.001);
+  const trendDown = ema50 ? (ema20 < ema50 * 0.999) : (price < ema20 * 0.999);
+  const aboveEma20 = price > ema20;
+
+  // ── Swing high/low: pakai data SEBELUM hari ini ──────────
+  const lookback = Math.min(20, n - 2);
+  const prevHighs  = highs.slice(-(lookback + 1), -1);
+  const prevLows   = lows.slice(-(lookback + 1), -1);
+  const swingHigh  = Math.max(...prevHighs);
+  const swingLow   = Math.min(...prevLows);
+
+  // ── ATR (volatility) ─────────────────────────────────────
+  let atrSum = 0, atrCnt = 0;
+  for (let i = Math.max(1, n - 14); i < n; i++) {
+    atrSum += Math.abs(closes[i] - closes[i - 1]);
+    atrCnt++;
+  }
+  const atr    = atrCnt ? atrSum / atrCnt : price * 0.02;
+  const atrPct = atr / price;
+
+  // ── Candle quality ────────────────────────────────────────
+  const candleRange  = highs[n-1] - lows[n-1];
+  const upperWick    = highs[n-1] - Math.max(price, open);
+  const lowerWick    = Math.min(price, open) - lows[n-1];
+  const bodySize     = Math.abs(price - open);
+  const isBullish    = price > open * 1.001;
+  // Upper wick panjang di candle bullish = sinyal lemah / rejection
+  const hasRejection = candleRange > 0 && upperWick / candleRange > 0.55;
+  // Doji / spinning top = ketidakpastian
+  const isDoji       = candleRange > 0 && bodySize / candleRange < 0.2;
+
+  // ── GUARD: HARD BLOCK kondisi berbahaya ──────────────────
+  // Jangan pernah beri sinyal beli pada kondisi ini:
+
+  // 1. Saham sedang downtrend kuat (EMA20 jauh di bawah EMA50)
+  if (ema50 && ema20 < ema50 * 0.97) return null;
+
+  // 2. Harga jauh di bawah EMA20 tanpa tanda reversal
+  if (price < ema20 * 0.94) return null;
+
+  // 3. RSI overbought ekstrem — risiko koreksi tinggi
+  if (r > 80) return null;
+
+  // 4. Volume hampir tidak ada hari ini (likuiditas sangat rendah)
+  if (avgVol > 0 && !hasDecentVol) return null;
+
+  // ── SCORING ──────────────────────────────────────────────
   let score = 0;
   const tags = [];
 
-  // TREND
-  const uptrend = ema50 ? ema20 > ema50 : price > ema20;
-  if (uptrend)        score += 2;
-  if (price > ema20)  score += 1;
+  // [A] TREND UTAMA — fondasi sinyal, wajib ada
+  if (trendUp) {
+    score += 3;
+  } else if (!trendDown) {
+    score += 1; // sideways, netral
+  }
+  // Harga di atas EMA20 = konfirmasi momentum jangka pendek
+  if (aboveEma20) score += 1;
 
-  // RSI
-  const r = parseFloat(rsi);
-  if      (r < 30)  { score += 4; tags.push('oversold'); }
-  else if (r < 40)  { score += 3; tags.push('oversold'); }
-  else if (r < 50)  { score += 1; }
-  else if (r < 65)  { score += 2; tags.push('momentum'); }
-  else if (r < 75)  { score += 1; }
-  else              { score -= 1; }
-
-  // BREAKOUT 10 hari
-  const lb = Math.min(10, n - 2);
-  const prevH = Math.max(...highs.slice(-lb - 1, -1));
-  const prevL = Math.min(...lows.slice(-lb - 1, -1));
-  if (price >= prevH * 0.995) { score += 3; tags.push('breakout'); }
-
-  // PULLBACK di uptrend
-  const h5 = Math.max(...highs.slice(-5));
-  if (uptrend && price < h5 * 0.98 && price > ema20 * 0.96) {
-    score += 2; tags.push('pullback');
+  // [B] RSI — harus dalam kondisi sehat, bukan sekadar oversold
+  // Oversold di downtrend = falling knife, tidak diberi bonus besar
+  if (r >= 40 && r <= 65) {
+    // Sweet spot: momentum sehat, tidak overbought, tidak oversold berbahaya
+    score += 3;
+    tags.push('momentum');
+  } else if (r > 65 && r <= 75) {
+    score += 1; // masih bisa lanjut tapi hati-hati
+  } else if (r >= 30 && r < 40) {
+    // Oversold ringan — hanya bagus kalau ada konfirmasi reversal lain
+    score += 1;
+    tags.push('oversold');
+  } else if (r < 30) {
+    // Oversold ekstrem — bisa reversal TAPI sering terus turun
+    // Tidak diberi poin sendiri, butuh konfirmasi volume/candle
+    tags.push('oversold');
   }
 
-  // BOUNCE dari support
-  if (price > prevL * 1.005 && price < prevL * 1.07 && r < 48) {
-    score += 2; tags.push('bounce');
+  // [C] BREAKOUT VALID — harus dikonfirmasi volume spike
+  if (price >= swingHigh * 0.998) {
+    if (hasVolSpike) {
+      // Breakout dengan volume = sinyal kuat
+      score += 4;
+      tags.push('breakout');
+    } else {
+      // Breakout tanpa volume = fake breakout, justru dikurangi
+      score -= 1;
+    }
   }
 
-  // VOLUME SPIKE
-  const vf = vols.filter(v => v > 0);
-  if (vf.length >= 4) {
-    const avgV = vf.slice(-8).reduce((a,b)=>a+b,0) / Math.min(8, vf.length);
-    if (vf[vf.length-1] > avgV * 1.3) { score += 2; tags.push('volume'); }
+  // [D] PULLBACK SEHAT di uptrend
+  // Harga koreksi ke dekat EMA20 tapi belum tembus = buying opportunity
+  if (trendUp && aboveEma20 && price < swingHigh * 0.97 && price > ema20 * 0.97) {
+    score += 2;
+    tags.push('pullback');
   }
 
-  // BULLISH CANDLE
-  if (price > open * 1.001) score += 1;
-
-  // KONSISTENSI 3 hari naik
-  if (n >= 4 && closes[n-1] > closes[n-2] && closes[n-2] > closes[n-3]) {
-    score += 1; tags.push('uptrend');
+  // [E] BOUNCE dari support — hanya valid di uptrend/sideways
+  // Harga memantul dari area support (swing low) dengan konfirmasi
+  if (!trendDown && price > swingLow * 1.005 && price < swingLow * 1.08 && r < 50) {
+    if (isBullish && !hasRejection) {
+      score += 2;
+      tags.push('bounce');
+    } else {
+      score += 1;
+    }
   }
 
-  // PENALTY fake breakout (upper wick > 60% range)
-  const range = highs[n-1] - lows[n-1];
-  if (range > 0 && (highs[n-1] - Math.max(price, open)) / range > 0.6
-      && tags.includes('breakout')) score -= 2;
+  // [F] VOLUME SPIKE sebagai konfirmasi independen
+  if (hasVolSpike && !tags.includes('breakout')) {
+    score += 2;
+    tags.push('volume');
+  }
 
-  // KLASIFIKASI — threshold realistis
+  // [G] KUALITAS CANDLE HARI INI
+  if (isBullish && !hasRejection && !isDoji) {
+    score += 1; // candle bullish bersih
+  }
+
+  // [H] KONSISTENSI NAIK 3 HARI (momentum berlanjut)
+  if (n >= 4 && closes[n-1] > closes[n-2] && closes[n-2] > closes[n-3] && closes[n-3] > closes[n-4]) {
+    score += 1;
+    if (!tags.includes('momentum')) tags.push('uptrend');
+  }
+
+  // ── PENALTY ───────────────────────────────────────────────
+  // Rejection candle (upper wick panjang) = sinyal lemah
+  if (hasRejection) score -= 2;
+
+  // Doji = ketidakpastian, kurangi confidence
+  if (isDoji) score -= 1;
+
+  // Harga masih di bawah EMA20 meski uptrend = belum konfirmasi
+  if (!aboveEma20 && trendUp) score -= 1;
+
+  // ── KLASIFIKASI ───────────────────────────────────────────
+  // Threshold lebih ketat dari sebelumnya untuk kurangi false positive
   let signal = 'WAIT';
-  if      (score >= 7) signal = 'STRONG BUY';
-  else if (score >= 4) signal = 'BUY';
-  else if (score >= 2) signal = 'WATCH';
+  if      (score >= 9)  signal = 'STRONG BUY';
+  else if (score >= 6)  signal = 'BUY';
+  else if (score >= 4)  signal = 'WATCH';
 
-  const confidence = score >= 7 ? 'HIGH' : score >= 4 ? 'MEDIUM' : 'LOW';
+  // WATCH yang tidak punya konfirmasi berarti (hanya trend) → drop ke WAIT
+  if (signal === 'WATCH' && tags.length === 0) signal = 'WAIT';
+
+  const confidence = score >= 9 ? 'HIGH' : score >= 6 ? 'MEDIUM' : 'LOW';
   const prevClose  = closes[n-2] || price;
   const changeP    = ((price - prevClose) / prevClose) * 100;
 
-  // ATR SL/TP
-  let atrSum = 0, atrCnt = 0;
-  for (let i = Math.max(1, n-14); i < n; i++) {
-    atrSum += Math.abs(closes[i] - closes[i-1]); atrCnt++;
-  }
-  const atrPct = atrCnt ? (atrSum / atrCnt) / price : 0.03;
-  const slPct  = Math.max(0.025, Math.min(atrPct * 2, 0.08));
-  const tpPct  = slPct * 2.5;
+  // ── SL / TP berbasis ATR ──────────────────────────────────
+  const slPct = Math.max(0.02, Math.min(atrPct * 2.0, 0.08)); // 2%–8%
+  const tpPct = slPct * 2.5; // RR 1:2.5
 
   return {
     sym, name, market, price, score, signal, confidence,
     ema20, ema50: ema50 || ema20,
     rsi: r.toFixed(1), tags: [...new Set(tags)],
-    uptrend, changeP, slPct, tpPct, ts: Date.now(),
+    uptrend: trendUp, changeP, slPct, tpPct,
+    volRatio: volRatio.toFixed(1),
+    ts: Date.now(),
   };
 }
 
@@ -1217,13 +1334,17 @@ async function startScan(forceRefresh = false) {
   if (APP.currentFilter === 'lowcap') list = US_STOCKS.map(s=>({...s,market:'US'}));
 
   const total = list.length;
-  let fetched = 0, fromCache = 0;
+  let fetched = 0, fromCache = 0, suspended = 0;
 
   // Proses cache dulu
   const needFetch = [];
   for (const s of list) {
     const cached = !forceRefresh ? getCached(s.sym) : null;
-    if (cached) { processResult(s, cached); fromCache++; }
+    if (cached) {
+        const res = processResult(s, cached);
+        if (res === 'SUSPENDED') suspended++;
+        fromCache++;
+      }
     else needFetch.push(s);
   }
   renderSignals(); updateStats();
@@ -1238,7 +1359,8 @@ async function startScan(forceRefresh = false) {
       const ohlcv = await fetchYahoo(s.sym, s.market);
       if (ohlcv) {
         setCache(s.sym, ohlcv, s.market);
-        processResult(s, ohlcv);
+        const res = processResult(s, ohlcv);
+        if (res === 'SUSPENDED') suspended++;
         fetched++;
       }
     }));
@@ -1257,8 +1379,9 @@ async function startScan(forceRefresh = false) {
   const now = new Date().toLocaleTimeString('id');
   const proxyUsed = FETCH_STATS.proxy ? ` · via ${FETCH_STATS.proxy}` : '';
   const failNote = FETCH_STATS.fail > 0 ? ` · ⚠️ ${FETCH_STATS.fail} gagal` : '';
+  const suspendNote = suspended > 0 ? ` · 🚫 ${suspended} suspend` : '';
   document.getElementById('lastScanInfo').textContent =
-    `Selesai ${now} · ${fetched} fetch · ${fromCache} cache${proxyUsed}${failNote}`;
+    `Selesai ${now} · ${fetched} fetch · ${fromCache} cache${suspendNote}${proxyUsed}${failNote}`;
   FETCH_STATS.ok = 0; FETCH_STATS.fail = 0; FETCH_STATS.proxy = '';
   updateCacheCount(); updateStats();
   showToast(`✓ ${APP.signals.length} sinyal ditemukan`);
@@ -1275,11 +1398,13 @@ async function startScan(forceRefresh = false) {
 
 function processResult(stock, ohlcv) {
   const r = analyzeStock(stock.sym, stock.name, ohlcv, stock.market);
+  if (r === null && isSuspended(ohlcv)) return 'SUSPENDED';
   if (r && r.signal !== 'WAIT') {
     const idx = APP.signals.findIndex(s => s.sym === stock.sym);
     if (idx >= 0) APP.signals[idx] = r; else APP.signals.push(r);
     APP.signals.sort((a,b) => b.score - a.score);
   }
+  return r ? r.signal : 'WAIT';
 }
 
 // Force refresh flow
@@ -1388,6 +1513,7 @@ function renderCard(s) {
         <div class="metric">RSI <span class="metric-val ${s.rsi<35?'green':s.rsi>70?'red':'yellow'}">${s.rsi}</span></div>
         <div class="metric">EMA <span class="metric-val ${s.uptrend?'green':'red'}">${s.uptrend?'↑ UP':'↓ DOWN'}</span></div>
         <div class="metric">1D <span class="metric-val ${chgCls}">${s.changeP>=0?'+':''}${s.changeP.toFixed(2)}%</span></div>
+        <div class="metric">VOL <span class="metric-val ${s.volRatio>=1.5?'green':s.volRatio<0.5?'red':'yellow'}">${s.volRatio}x</span></div>
       </div>
       <div class="card-bottom">
         <div class="tag-list">${tagHtml}</div>
@@ -1414,62 +1540,30 @@ function openModal(sym) {
   APP.currentSig = s;
 
   const entry = s.price;
-  const sl = entry * (1 - s.slPct);
-  const tp = entry * (1 + s.tpPct);
+  const sl    = entry * (1 - s.slPct);
+  const tp    = entry * (1 + s.tpPct);
   const slPctStr = (s.slPct * 100).toFixed(1);
   const tpPctStr = (s.tpPct * 100).toFixed(1);
-
-  const eq = EQ.current;
-  const riskPct = parseFloat(document.getElementById('riskInput').value) || 1;
-  const riskAmt = eq * (riskPct / 100);
-
-  // Lot calculation
-  let lotStr = '—', capitalStr = '—', profitStr = '—';
-  if (eq > 0) {
-    if (s.market === 'IDX') {
-      // IDX: 1 lot = 100 lembar
-      const riskPerLot = (entry - sl) * 100;
-      const lots = riskPerLot > 0 ? Math.floor(riskAmt / riskPerLot) : 0;
-      const capital = lots * entry * 100;
-      const profit = lots * (tp - entry) * 100;
-      lotStr = lots + ' lot (' + (lots*100).toLocaleString('id') + ' lembar)';
-      capitalStr = 'Rp ' + capital.toLocaleString('id');
-      profitStr = '+Rp ' + profit.toLocaleString('id');
-    } else {
-      // US: dalam USD
-      const riskPerShare = entry - sl;
-      const shares = riskPerShare > 0 ? Math.floor(riskAmt / (riskPerShare * APP.USDRATE)) : 0;
-      const capital = shares * entry;
-      const profit = shares * (tp - entry);
-      lotStr = shares + ' lembar';
-      capitalStr = '$' + capital.toFixed(2);
-      profitStr = '+$' + profit.toFixed(2);
-    }
-  }
-
-  const fmt = v => s.market === 'IDX' ? 'Rp ' + v.toLocaleString('id') : '$' + v.toFixed(2);
+  const fmt = v => s.market === 'IDX' ? 'Rp ' + Math.round(v).toLocaleString('id') : '$' + v.toFixed(2);
 
   document.getElementById('modalTitle').textContent = s.sym + ' — ' + s.signal;
-  document.getElementById('modalSub').textContent = s.name + ' · ' + (s.market==='IDX'?'🇮🇩 IDX':'🇺🇸 US') + ' · Score ' + s.score;
+  document.getElementById('modalSub').textContent   = s.name + ' · ' + (s.market==='IDX'?'🇮🇩 IDX':'🇺🇸 US') + ' · Score ' + s.score;
   document.getElementById('mEntry').textContent = fmt(entry);
-  document.getElementById('mSL').textContent = fmt(sl) + ' (-' + slPctStr + '%)';
-  document.getElementById('mTP').textContent = fmt(tp) + ' (+' + tpPctStr + '%)';
-  document.getElementById('mSize').textContent = eq > 0 ? lotStr : 'Set modal dulu';
-  document.getElementById('mCapital').textContent = eq > 0 ? capitalStr : '—';
-  document.getElementById('mProfit').textContent = eq > 0 ? profitStr : '—';
+  document.getElementById('mSL').textContent    = fmt(sl) + ' (-' + slPctStr + '%)';
+  document.getElementById('mTP').textContent    = fmt(tp) + ' (+' + tpPctStr + '%)';
+  document.getElementById('mRR').textContent    = '1 : 2.5';
 
-  // Analysis text
   const analText = [
-    `<strong>Trend:</strong> EMA20 ${s.uptrend?'di atas':'di bawah'} EMA50 → ${s.uptrend?'Uptrend':'Downtrend'}`,
-    `<strong>RSI:</strong> ${s.rsi} → ${s.rsi<35?'Oversold, potensi reversal':s.rsi>70?'Overbought, hati-hati':'Normal range'}`,
-    s.tags.includes('breakout') ? `<strong>Breakout:</strong> Harga menembus high 20 hari` : '',
-    s.tags.includes('pullback') ? `<strong>Pullback:</strong> Koreksi ringan di atas EMA20` : '',
-    s.tags.includes('volume') ? `<strong>Volume:</strong> Volume hari ini >1.5x rata-rata` : '',
-    `<strong>SL/TP:</strong> Dihitung dari ATR 14 hari (RR 1:2.5)`,
+    `<strong>Trend:</strong> EMA20 ${s.uptrend?'di atas EMA50 → Uptrend aktif':'sideways/transisi'}`,
+    `<strong>RSI:</strong> ${s.rsi} → ${s.rsi<35?'⚠️ Oversold ekstrem, tunggu konfirmasi reversal':s.rsi>75?'⚠️ Overbought, hati-hati':s.rsi>=40&&s.rsi<=65?'✅ Sweet spot momentum':'Normal'}`,
+    `<strong>Volume:</strong> ${s.volRatio}x rata-rata — ${s.volRatio>=1.5?'✅ Konfirmasi kuat':s.volRatio>=0.8?'Normal':'⚠️ Volume rendah, kurang likuid'}`,
+    s.tags.includes('breakout') ? `<strong>Breakout:</strong> ✅ Tembus swing high 20 hari dengan konfirmasi volume` : '',
+    s.tags.includes('pullback') ? `<strong>Pullback:</strong> Koreksi sehat ke area EMA20, potensi lanjut naik` : '',
+    s.tags.includes('bounce')   ? `<strong>Bounce:</strong> Memantul dari area support` : '',
+    `<strong>SL/TP:</strong> Dihitung dari ATR 14 hari (Risk:Reward = 1:2.5)`,
+    `<strong>⚠️ Disclaimer:</strong> Sinyal ini BUKAN rekomendasi investasi. Selalu DYOR.`,
   ].filter(Boolean).join('<br>');
   document.getElementById('mAnalysis').innerHTML = analText;
-  document.getElementById('btnTrade').disabled = eq <= 0;
-
   document.getElementById('modalOverlay').classList.add('open');
 }
 
@@ -1478,27 +1572,24 @@ function closeModal() { document.getElementById('modalOverlay').classList.remove
 
 function takeTrade() {
   const s = APP.currentSig;
-  if (!s || EQ.current <= 0) return;
+  if (!s) return;
 
   const entry = s.price;
-  const sl = entry * (1 - s.slPct);
-  const tp = entry * (1 + s.tpPct);
-  const riskPct = parseFloat(document.getElementById('riskInput').value) || 1;
-  const riskAmt = EQ.current * (riskPct / 100);
+  const sl    = entry * (1 - s.slPct);
+  const tp    = entry * (1 + s.tpPct);
 
   EQ.trades.unshift({
     id: Date.now(),
     sym: s.sym, name: s.name, market: s.market,
-    entry, sl, tp, riskAmt,
+    entry, sl, tp,
     signal: s.signal,
-    status: 'OPEN',
+    status: 'OPEN',  // user update manual
     ts: new Date().toLocaleString('id'),
-    pnl: 0,
   });
   saveEq();
-  updateEqUI();
+  renderCatatan();
   closeModal();
-  showToast('Trade dicatat: ' + s.sym);
+  showToast('✓ Dicatat: ' + s.sym);
 }
 
 function addWatch() {
@@ -1513,55 +1604,88 @@ function addWatch() {
 }
 
 // ============================================================
-// EQUITY
+// CATATAN TRADING
 // ============================================================
-function setEquity() {
-  const v = parseFloat(document.getElementById('eqInput').value);
-  if (!v || v <= 0) { showToast('Masukkan jumlah valid'); return; }
-  EQ.initial = v; EQ.current = v; EQ.trades = [];
-  saveEq(); updateEqUI();
-  showToast('Modal diset: Rp ' + v.toLocaleString('id'));
+function updateStatus(id, status) {
+  const t = EQ.trades.find(t => t.id === id);
+  if (!t) return;
+  t.status = status;
+  saveEq();
+  renderCatatan();
+  showToast(t.sym + ' → ' + status);
 }
 
-function updateEqUI() {
-  if (EQ.current > 0) {
-    document.getElementById('eqAmount').textContent = 'Rp ' + EQ.current.toLocaleString('id', {maximumFractionDigits:0});
-    const diff = EQ.current - EQ.initial;
-    const pct = EQ.initial > 0 ? (diff/EQ.initial*100).toFixed(2) : 0;
-    const el = document.getElementById('eqChange');
-    el.textContent = (diff>=0?'+':'') + 'Rp ' + Math.abs(diff).toLocaleString('id',{maximumFractionDigits:0}) + ' (' + pct + '%)';
-    el.style.color = diff >= 0 ? 'var(--green)' : 'var(--red)';
-  }
-  const wins = EQ.trades.filter(t=>t.status==='WIN').length;
-  const losses = EQ.trades.filter(t=>t.status==='LOSS').length;
-  const opens = EQ.trades.filter(t=>t.status==='OPEN').length;
-  const wr = (wins+losses)>0 ? (wins/(wins+losses)*100).toFixed(0)+'%' : '—';
-  document.getElementById('eqWins').textContent = wins;
-  document.getElementById('eqLosses').textContent = losses;
-  document.getElementById('eqOpen').textContent = opens;
-  document.getElementById('eqWR').textContent = wr;
-  renderTrades();
-  renderWatchlist();
+function deleteNote(id) {
+  EQ.trades = EQ.trades.filter(t => t.id !== id);
+  saveEq();
+  renderCatatan();
+  showToast('Catatan dihapus');
 }
 
-function renderTrades() {
-  const el = document.getElementById('tradesList');
-  if (EQ.trades.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>Belum ada trade</div>';
+function renderCatatan() {
+  const el = document.getElementById('catatanList');
+  if (!el) return;
+
+  const wins   = EQ.trades.filter(t => t.status === 'PROFIT').length;
+  const losses = EQ.trades.filter(t => t.status === 'LOSS').length;
+  const total  = EQ.trades.length;
+  const wr = (wins + losses) > 0 ? (wins / (wins + losses) * 100).toFixed(0) + '%' : '—';
+
+  const st = document.getElementById('statTotal');
+  const sw = document.getElementById('statWin');
+  const sl = document.getElementById('statLoss');
+  const swr = document.getElementById('statWR');
+  if (st) st.textContent = total;
+  if (sw) sw.textContent = wins;
+  if (sl) sl.textContent = losses;
+  if (swr) swr.textContent = wr;
+
+  if (total === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>Belum ada catatan<br><span style="font-size:11px">Tap sinyal → tombol CATAT</span></div>';
     return;
   }
-  el.innerHTML = EQ.trades.slice(0,30).map(t => `
-    <div class="trade-item">
-      <div class="ti-left">
-        <div class="ti-name">${t.market==='IDX'?'🇮🇩':'🇺🇸'} ${t.sym}</div>
-        <div class="ti-meta">${t.ts} · ${t.signal}</div>
-      </div>
-      <div class="ti-right">
-        <div class="ti-pnl" style="color:${t.status==='WIN'?'var(--green)':t.status==='LOSS'?'var(--red)':'var(--yellow)'}">
-          ${t.status==='OPEN'?'OPEN':((t.pnl>=0?'+':'')+t.pnl.toFixed(0))}
+
+  const fmt = (v, market) => market === 'IDX'
+    ? 'Rp ' + Math.round(v).toLocaleString('id')
+    : '$' + v.toFixed(2);
+
+  const statusColor = { OPEN:'var(--yellow)', PROFIT:'var(--green)', LOSS:'var(--red)', BATAL:'var(--text3)' };
+  const statusLabel = { OPEN:'⏳ OPEN', PROFIT:'✅ PROFIT', LOSS:'❌ LOSS', BATAL:'🚫 BATAL' };
+
+  el.innerHTML = EQ.trades.slice(0, 50).map(t => `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 13px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-size:14px;font-weight:800">${t.market==='IDX'?'🇮🇩':'🇺🇸'} ${t.sym}
+            <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:4px;background:var(--bg3);color:var(--text2)">${t.signal}</span>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">${t.ts}</div>
         </div>
-        <div class="ti-status ${t.status.toLowerCase()}">${t.status}</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;font-weight:800;color:${statusColor[t.status]||'var(--text2)'}">${statusLabel[t.status]||t.status}</span>
+          <button onclick="deleteNote(${t.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:0 2px">✕</button>
+        </div>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+        <div style="background:var(--bg3);border-radius:6px;padding:6px 8px">
+          <div style="font-size:9px;color:var(--text3);margin-bottom:2px">ENTRY</div>
+          <div style="font-size:12px;font-weight:700">${fmt(t.entry, t.market)}</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:6px;padding:6px 8px">
+          <div style="font-size:9px;color:var(--text3);margin-bottom:2px">STOP LOSS</div>
+          <div style="font-size:12px;font-weight:700;color:var(--red)">${fmt(t.sl, t.market)}</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:6px;padding:6px 8px">
+          <div style="font-size:9px;color:var(--text3);margin-bottom:2px">TAKE PROFIT</div>
+          <div style="font-size:12px;font-weight:700;color:var(--green)">${fmt(t.tp, t.market)}</div>
+        </div>
+      </div>
+      ${t.status === 'OPEN' ? `
+      <div style="display:flex;gap:6px">
+        <button onclick="updateStatus(${t.id},'PROFIT')" style="flex:1;padding:7px;background:var(--green2);border:1px solid #00c89640;color:var(--green);border-radius:7px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit">✅ Profit</button>
+        <button onclick="updateStatus(${t.id},'LOSS')"   style="flex:1;padding:7px;background:var(--red2);border:1px solid rgba(255,77,106,0.3);color:var(--red);border-radius:7px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit">❌ Loss</button>
+        <button onclick="updateStatus(${t.id},'BATAL')"  style="flex:1;padding:7px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);border-radius:7px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit">🚫 Batal</button>
+      </div>` : ''}
     </div>
   `).join('');
 }
@@ -1648,11 +1772,11 @@ function setFilter(f) {
 
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach((t,i) => {
-    t.classList.toggle('active', ['signals','portfolio','watchlist'][i] === name);
+    t.classList.toggle('active', ['signals','catatan','watchlist'][i] === name);
   });
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
-  if (name === 'portfolio') updateEqUI();
+  if (name === 'catatan') renderCatatan();
   if (name === 'watchlist') renderWatchlist();
 }
 
@@ -1696,7 +1820,7 @@ document.addEventListener('click', e => {
 // INIT
 // ============================================================
 loadAll();
-updateEqUI();
+renderCatatan();
 updateCacheCount();
 updateMarketStatus();
 setInterval(updateMarketStatus, 30000);
